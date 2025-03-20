@@ -17,6 +17,7 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include<memory/paddr.h>
 #include "sdb.h"
 
 static int is_batch_mode = false;
@@ -53,6 +54,60 @@ static int cmd_q(char *args) {
   return -1;
 }
 
+static int cmd_si(char *args){
+  char *arg = strtok(NULL," ");
+  uint64_t  num = 1;
+  if(arg == NULL){
+    cpu_exec(num);
+  }
+  else{
+    sscanf(arg,"%lu",&num);
+    cpu_exec(num);
+  }
+  return 0;
+}
+
+static int cmd_info(char *args){
+  char *arg = strtok(NULL," ");
+  if(args != NULL){
+    if (strcmp(arg, "r") == 0)
+    {
+      isa_reg_display();
+    }
+    else if (strcmp(arg, "w") == 0)
+    {
+      assert(0);
+    }
+    else
+    {
+      printf("Unknow commad '%s\n'",arg);
+      return -1;
+    }
+  }
+  return 0;
+}
+
+static int cmd_x(char * args){
+  char *arg = strtok(NULL," ");
+  char *addr_ = strtok(NULL," ");
+
+  int num = 0;
+  paddr_t addr;
+  sscanf(arg, "%d", &num);
+  sscanf(addr_, "%x", &addr);
+
+  for (int i = 0; i < num; i++)
+  {
+    printf("0x%08x: ", addr);
+    for (int j = 0; j < 4; j++)
+    {
+      printf("0x%08x",paddr_read(addr +=4, 4));
+    }
+    puts("");
+  }
+  return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -63,6 +118,9 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
+  { "si","Single-step execution",cmd_si},
+  {"info","Print program state",cmd_info},
+  {"x","Scan addr info",cmd_x}
   
   /* TODO: Add more commands */
 
