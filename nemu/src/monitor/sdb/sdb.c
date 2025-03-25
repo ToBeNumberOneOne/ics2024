@@ -108,6 +108,16 @@ static int cmd_x(char * args){
   return 0;
 }
 
+static int cmd_p(char *args) {
+  char *arg = strtok(NULL, "");
+
+  bool success = true;
+  printf("%u\n", expr(arg, &success));
+
+  return 0;
+
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -120,7 +130,8 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si","Single-step execution",cmd_si},
   {"info","Print program state",cmd_info},
-  {"x","Scan addr info",cmd_x}
+  {"x","Scan addr info",cmd_x},
+  { "p", "expression evaluation", cmd_p},
   
   /* TODO: Add more commands */
 
