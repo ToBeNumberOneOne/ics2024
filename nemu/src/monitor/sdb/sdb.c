@@ -111,12 +111,18 @@ static int cmd_x(char * args){
 
 static int cmd_p(char *args) {
   char *arg = strtok(NULL, "");
-
-  bool success = true;
-  printf("%u\n", expr(arg, &success));
-
-  return 0;
-
+  if(arg == NULL)
+  {
+    Log("Invaid commad or arg !!!");
+    return 0;
+  }
+  else
+  {
+    bool success = true;
+    printf("%u\n", expr(arg, &success));
+    return 0;
+  }
+  
 }
 
 static int cmd_help(char *args);

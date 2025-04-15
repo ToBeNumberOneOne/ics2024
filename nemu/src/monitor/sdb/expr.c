@@ -153,7 +153,7 @@ static bool make_token(char *e) {
 }
 
 
-int op_priority(int r) {
+static int op_priority(int r) {
 	switch(r) {
 		case '+': case '-':
 			return 3;
@@ -170,7 +170,7 @@ int op_priority(int r) {
 }
 }
 
-int primary_operator(int p, int q) {
+static int primary_operator(int p, int q) {
 	int op = 0;
 	int tmp_compare = 10;
   int num = 0;
@@ -196,23 +196,19 @@ int primary_operator(int p, int q) {
 }
 
 
-int check_parentheses(int p, int q) {
+static int check_parentheses(int p, int q) {
     if (tokens[p].type != TK_LP || tokens[q].type != TK_RP) {
         return 0;
     }
     int num = 0;
-    int falg = 0;
+
     for (int i = p; i <= q; i++) {
         if (tokens[i].type == TK_LP) num++;
         if (tokens[i].type == TK_RP) num--;
-        if (i != q && num == 0) {
-            falg = 1;
-        }
+        if (num < 0) assert(0); 
     }
-    if (num != 0) {
-      assert(0);
-    }
-    return falg == 0 ? 1 : 2;
+    
+    return (num == 0)?1:0;
 }
 
 
@@ -245,10 +241,10 @@ word_t eval(int p, int q) {
     word_t val2 = eval(op + 1, q);
 
     switch (tokens[op].type) {
-      case '+': printf ("%u\n", val1 + val2); return val1 + val2;
-      case '-': printf ("%u\n", val1 - val2); return val1 - val2;
-      case '*': printf ("%u\n", val1 * val2); return val1 * val2;
-      case '/': printf ("%u\n", val1 / val2); return val1 / val2;
+      case '+':  return val1 + val2;
+      case '-':  return val1 - val2;
+      case '*':  return val1 * val2;
+      case '/':  return val1 / val2;
       case TK_AND: return val1 && val2;
       case TK_EQ: return val1 == val2;
       case TK_NEQ: return val1 != val2;
