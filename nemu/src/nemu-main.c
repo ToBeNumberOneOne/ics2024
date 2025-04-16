@@ -20,6 +20,8 @@ void am_init_monitor();
 void engine_start();
 int is_exit_status_bad();
 
+uint32_t expr(const char *e, bool *success);
+
 int main(int argc, char *argv[]) {
   /* Initialize the monitor. */
 #ifdef CONFIG_TARGET_AM
@@ -27,6 +29,24 @@ int main(int argc, char *argv[]) {
 #else
   init_monitor(argc, argv);
 #endif
+
+  //test !
+  // FILE *fp = fopen("/home/jskj/ics2024/nemu/tools/gen-expr/input", "r");
+  // assert(fp != NULL);
+  // int i = 0;
+  // char e[65536];
+  // uint32_t num = 0;
+  // while(fgets(e, sizeof(e), fp)) {
+  //    e[strcspn(e, "\n")] = '\0';
+  //    char *arg = strtok(e, " ");
+  //    sscanf(arg, "%u", &num);
+  //    char *expr_str = strtok(NULL, "");
+  //    bool success = true;
+  //    if (num != expr(expr_str, &success)) {
+  //      printf("num: %u\nexpr: %s\nret: %u\n", num, expr_str, expr(expr_str, &success));
+  //      assert(0);
+  //    }
+  //  }
 
   /* Start engine. */
   engine_start();

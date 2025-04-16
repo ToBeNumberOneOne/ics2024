@@ -119,8 +119,8 @@ static bool make_token(char *e) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
 
-        Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
-             i, rules[i].regex, position, substr_len, substr_len, substr_start);
+        //Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
+             //i, rules[i].regex, position, substr_len, substr_len, substr_start);
 
         position += substr_len;
 
@@ -189,12 +189,12 @@ static bool make_token(char *e) {
           case '*':
             // todo: We need to determine whether it is a dereference operator.
             if (nr_token != 0 && (tokens[nr_token-1].type == TK_DEC || tokens[nr_token-1].type == TK_HEX || tokens[nr_token-1].type == TK_REG || tokens[nr_token-1].type == ')')) {
-              // minus
+              // multiply
               tokens[nr_token].type = '*';
               tokens[nr_token].priority = 3;
             }
             else {
-              // negation
+              // dereference
               tokens[nr_token].type = TK_DEREF;
               tokens[nr_token].priority = 2;
             }

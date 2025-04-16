@@ -31,43 +31,82 @@ static char *code_format =
 "  return 0; "
 "}";
 
-
-static int gen_rand_num() {
-  return rand() % 100; 
+static inline int choose(int n) {
+  return rand() % n;
 }
 
-static char gen_rand_op() {
-  char ops[] = {'+', '-', '*', '/'};
-  return ops[rand() % 4];
+static inline void gen(char e) {
+  int i = 0;
+  while (buf[i] != '\0') i++;
+  buf[i] = e;
+  buf[i+1] = '\0';
+  return;
+}
+
+static inline void gen_num() {
+  uint32_t num = ((uint32_t) rand()) % 100;
+  sprintf(buf+strlen(buf), "%d", num);
+  return;
+}
+
+static inline void gen_op() {
+  switch(choose(4)) {
+    case 0: gen('+'); break;
+    case 1: gen('-'); break;
+    case 2: gen('*'); break;
+    case 3: gen('/'); break;
+    default: break;
+  }
 }
 
 static void gen_rand_expr() {
-  buf[0] = '\0';
-
-  int num_expr = rand() % 5 + 1; // 生成 1 到 5 个表达式
-
-  for (int i = 0; i < num_expr; i++) {
-      if (i > 0) {
-          strcat(buf, " ");
-      }
-
-      int num1 = gen_rand_num();
-      char op = gen_rand_op();
-      int num2 = gen_rand_num();
-
-      // 避免除数为 0
-      while (op == '/' && num2 == 0) {
-          num2 = gen_rand_num();
-      }
-
-      char temp[100];
-      sprintf(temp, "%d %c %d", num1, op, num2);
-      strcat(buf, temp);
-
-      if (i < num_expr - 1) {
-          strcat(buf, " + "); // 用 + 连接多个表达式
-      }
+  // buf[0] = '\0';
+  char *s = buf;
+  if (strlen(buf) > 0 && *(buf+strlen(buf)-1) == '/') {
+    s = buf+strlen(buf);
   }
+  int n = choose(3);
+  switch(n) {
+    case 0: gen_num(); break;
+    case 1: 
+      gen('(');
+      gen_rand_expr();
+      gen(')');
+      break;
+    default:
+      gen_rand_expr();
+      gen_op();
+      gen_rand_expr();
+      break;
+  }
+
+  // test division 0
+  if (s != buf) {
+    sprintf(code_buf, code_format, s);
+    FILE *fp = fopen("/tmp/.code.c", "w");
+    assert(fp != NULL);
+    fputs(code_buf, fp);
+    fclose(fp);
+
+    int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
+    if(ret != 0){
+			printf("ret: %d\n",ret);
+		}
+		
+		fp = popen("/tmp/.expr", "r");
+		assert(fp != NULL);
+
+		int result;
+		fscanf(fp, "%d", &result);
+		pclose(fp);
+		
+		if(result == 0){
+			memset((void*)s, 0, strlen(s) * sizeof(char));
+			gen_rand_expr();
+		}
+
+  }
+
 }
 
 int main(int argc, char *argv[]) {
@@ -98,7 +137,7 @@ int main(int argc, char *argv[]) {
     ret = fscanf(fp, "%d", &result);
     pclose(fp);
 
-    printf("%u %s\n", result, buf);
+    printf("res: %u %s\n", result, buf);
   }
   return 0;
 }
